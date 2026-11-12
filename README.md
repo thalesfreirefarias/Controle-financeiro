@@ -1,5 +1,6 @@
 # Controle Financeiro Essencial
 
+
 Sistema de controle financeiro desenvolvido em Python
 com a biblioteca OpenPyXL.
 

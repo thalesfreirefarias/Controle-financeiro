@@ -1,54 +1,83 @@
-from openpyxl import Workbook
+from pathlib import Path
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Font, PatternFill, Alignment
 
-# Criar arquivo Excel
-wb = Workbook()
+# Nome do arquivo
+arquivo = Path("controle_financeiro.xlsx")
 
-# Criar e nomear as abas
-dashboard = wb.active
-dashboard.title = "Dashboard"
-
-lancamentos = wb.create_sheet("Lançamentos")
-categorias = wb.create_sheet("Categorias")
-instrucoes = wb.create_sheet("Como Usar")
-
-# Definir cores do projeto
+# Cores do projeto
 AZUL = "17365D"
 BRANCO = "FFFFFF"
 
-# Criar títulos nas abas
-titulos = {
-    "Dashboard": "CONTROLE FINANCEIRO ESSENCIAL",
-    "Lançamentos": "REGISTRO DE RECEITAS E DESPESAS",
-    "Categorias": "CATEGORIAS FINANCEIRAS",
-    "Como Usar": "MANUAL DE UTILIZAÇÃO"
-}
+# Verificar se o arquivo já existe
+if arquivo.exists():
+    wb = load_workbook(arquivo)
+    print("Arquivo existente carregado!")
 
-for nome, titulo in titulos.items():
-    ws = wb[nome]
+else:
+    # Criar arquivo Excel
+    wb = Workbook()
 
-    ws["A1"] = titulo
-    ws["A1"].font = Font(
-        name="Aptos",
-        size=16,
-        bold=True,
-        color=BRANCO
-    )
+    # Criar e nomear as abas
+    dashboard = wb.active
+    dashboard.title = "Dashboard"
 
-    ws["A1"].fill = PatternFill(
-        start_color=AZUL,
-        end_color=AZUL,
-        fill_type="solid"
-    )
+    lancamentos = wb.create_sheet("Lançamentos")
+    categorias = wb.create_sheet("Categorias")
+    instrucoes = wb.create_sheet("Como Usar")
 
-    ws["A1"].alignment = Alignment(
-        horizontal="center"
-    )
+    # Títulos das abas
+    titulos = {
+        "Dashboard": "CONTROLE FINANCEIRO ESSENCIAL",
+        "Lançamentos": "REGISTRO DE RECEITAS E DESPESAS",
+        "Categorias": "CATEGORIAS FINANCEIRAS",
+        "Como Usar": "MANUAL DE UTILIZAÇÃO"
+    }
 
-    ws.merge_cells("A1:F2")
-    ws.column_dimensions["A"].width = 25
+    # Formatar títulos
+    for nome, titulo in titulos.items():
+        ws = wb[nome]
 
-# Salvar
-wb.save("controle_financeiro.xlsx")
+        ws["A1"] = titulo
+        ws["A1"].font = Font(
+            name="Aptos",
+            size=16,
+            bold=True,
+            color=BRANCO
+        )
 
-print("Estrutura criada com sucesso!")
+        ws["A1"].fill = PatternFill(
+            start_color=AZUL,
+            end_color=AZUL,
+            fill_type="solid"
+        )
+
+        ws["A1"].alignment = Alignment(
+            horizontal="center"
+        )
+
+        ws.merge_cells("A1:F2")
+        ws.column_dimensions["A"].width = 25
+
+    # Cabeçalhos dos lançamentos
+    cabecalhos = ["Data", "Descrição", "Categoria", "Tipo", "Valor"]
+
+    for coluna, titulo in enumerate(cabecalhos, start=1):
+        lancamentos.cell(row=4, column=coluna, value=titulo)
+
+    # Dados de exemplo
+    dados = [
+        ["12/11/2026", "Salário", "Trabalho", "Receita", 3500],
+        ["12/11/2026", "Mercado", "Alimentação", "Despesa", 250],
+        ["12/11/2026", "Academia", "Saúde", "Despesa", 120]
+    ]
+
+    for linha in dados:
+        lancamentos.append(linha)
+
+    print("Estrutura inicial criada!")
+
+# Salvar arquivo
+wb.save(arquivo)
+
+print("Controle financeiro salvo com sucesso!")
